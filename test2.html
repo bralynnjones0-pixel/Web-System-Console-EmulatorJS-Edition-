@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>System Console</title>
+<style>
+/* BASE STYLES */
+html, body { margin:0; padding:0; height:100%; background:#111; color:#fff; font-family:Arial,sans-serif; overflow: hidden; }
+#topbar { height:56px; background:#222; display:flex; align-items:center; padding:0 14px; box-sizing:border-box; font-size:14px; color:#bbb; gap:10px; border-bottom:1px solid #333; }
+#layout { display:flex; height:calc(100% - 56px); }
+#sidebar { width:260px; background:#1a1a1a; border-right:1px solid #333; padding:12px; box-sizing:border-box; overflow-y:auto; }
+.section-title { margin:14px 0 6px; color:#555; font-size:11px; text-transform:uppercase; letter-spacing:1px; font-weight:bold; }
+#sidebar button { width:100%; margin-bottom:6px; padding:8px; background:#2a2a2a; border:none; color:#eee; cursor:pointer; text-align:left; border-radius:4px; transition: 0.2s; }
+#sidebar button:hover { background:#3a3a3a; color:#fff; }
+#game { flex:1; background:#000; display:flex; align-items:center; justify-content:center; position: relative; }
+#emulator { width:100%; height:100%; }
+.load-btn { background: #4a90e2 !important; font-weight: bold; margin-bottom: 20px !important; text-align: center !important; color: white !important;}
+.reset-btn { background: #333 !important; color: #888 !important; padding: 6px 12px !important; font-size: 11px !important; border-radius: 4px; border: 1px solid #444 !important; cursor: pointer; }
+.lib-btn { background: #4a90e2 !important; color: #fff !important; padding: 6px 12px !important; font-size: 11px !important; border-radius: 4px; border: none !important; cursor: pointer; font-weight: bold; }
+
+/* PERSISTENT LIBRARY ROW STYLES */
+.game-row { display: flex; gap: 4px; margin-bottom: 6px; }
+.game-btn { flex: 1; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+.del-btn { width: 32px !important; background: #331111 !important; color: #d9534f !important; text-align: center !important; font-weight: bold; padding: 8px 0 !important; font-size: 16px !important;}
+.del-btn:hover { background: #d9534f !important; color: #fff !important; }
+
+/* PAGES */
+#main-ui, #info-page { display: none; height: 100%; flex-direction: column; }
+
+/* DASHBOARD STYLING */
+#info-page { background: #111; padding: 20px; box-sizing: border-box; overflow-y: auto; display: flex; align-items: center; justify-content: center; }
+.panel-box { background: #1a1a1a; padding: 40px; border: 1px solid #333; border-radius: 12px; max-width: 680px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.sys-title { color: #4a90e2; font-size: 28px; font-weight: bold; margin: 0 0 20px 0; }
+.version-text { color: #eee; line-height: 1.5; margin-bottom: 25px; font-size: 15px; }
+.version-text strong { color: #fff; }
+
+.guide-box { background: #222; border: 1px solid #333; border-radius: 6px; padding: 20px; margin-bottom: 30px; }
+.guide-box h4 { margin: 0 0 10px 0; font-size: 14px; }
+.guide-box p { margin: 5px 0; font-size: 13px; color: #bbb; line-height: 1.4; }
+.guide-box ul { margin: 5px 0 15px 0; padding-left: 20px; color: #bbb; font-size: 13px; }
+.guide-box li { margin-bottom: 4px; }
+
+.supported-header { color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: bold; }
+.file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+.file-item { background: #111; padding: 12px 15px; border-radius: 4px; border-left: 3px solid #4a90e2; font-size: 14px; color: #ddd; display: flex; align-items: center; }
+
+.btn-continue { background: #4a90e2; color: white; border: none; padding: 18px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; margin-top: 10px; }
+.btn-continue:hover { background: #357abd; }
+</style>
+</head>
+<body>
+
+<!-- INFORMATION PAGE -->
+<div id="info-page">
+  <div class="panel-box">
+    <h1 class="sys-title">System Information</h1>
+    
+    <p class="version-text">
+      <strong>Version 1.0:</strong> This is the first version of the system. Better versions with improved stability are coming soon.
+    </p>
+
+    <div class="guide-box">
+      <h4 style="color: #d9534f;">Network & Troubleshooting Guide:</h4>
+      <ul>
+        <li><strong>PSP, PS1, and 3DS</strong> only work outside of school networks.</li>
+        <li>If games lag, try refreshing the page or clearing your browser cache.</li>
+      </ul>
+      <hr style="border:0; border-top: 1px solid #333; margin: 15px 0;">
+      <h4 style="color: #f0ad4e;">Unzipping Files:</h4>
+      <p>If you have a <strong>.zip</strong> or <strong>.7z</strong> file that won't open, unzip it at <a href="https://extract.me/" target="_blank" style="color: #4a90e2; text-decoration: none;">https://extract.me/</a> before loading.</p>
+    </div>
+
+    <div class="supported-header">Supported Formats</div>
+    <div class="file-grid">
+      <div class="file-item">DS: .nds</div>
+      <div class="file-item">PSP: .iso, .cso</div>
+      <div class="file-item">GBA: .gba</div>
+      <div class="file-item">GB/GBC: .gb, .gbc</div>
+      <div class="file-item">NES: .nes</div>
+      <div class="file-item">SNES: .smc, .sfc</div>
+      <div class="file-item">N64: .n64, .z64</div>
+      <div class="file-item">PS1: .bin, .cue</div>
+      <div class="file-item">Sega: .gen, .md, .sms</div>
+      <div class="file-item">3DS: .3ds, .cci</div>
+    </div>
+
+    <button class="btn-continue" onclick="launchConsole()">Continue to Emulator</button>
+  </div>
+</div>
+
+<!-- MAIN EMULATOR UI -->
+<div id="main-ui">
+  <div id="topbar">
+    <button class="lib-btn" onclick="showLibrary()">Library Info</button>
+    <span id="status">Ready</span>
+    <button class="reset-btn" onclick="location.reload()">Emergency Reset</button>
+    <span id="progress" style="margin-left: auto; color: #4a90e2;"></span>
+  </div>
+  <div id="layout">
+    <div id="sidebar"></div>
+    <div id="game"><div style="color:#444">Load ROMs to begin</div></div>
+  </div>
+</div>
+
+<script>
+/** * 1. INITIALIZATION */
+window.onload = () => {
+  document.getElementById('info-page').style.display = 'flex';
+};
+
+/** * 2. PERSISTENT LIBRARY (IndexedDB) */
+let db;
+const request = indexedDB.open("SystemLibraryDB", 1);
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  db.createObjectStore("roms", { keyPath: "name" });
+};
+request.onsuccess = e => { 
+  db = e.target.result; 
+};
+
+/** * 3. PAGE NAVIGATION */
+function showLibrary() {
+  document.getElementById('main-ui').style.display = "none";
+  document.getElementById('info-page').style.display = "flex";
+}
+
+function launchConsole() {
+  document.getElementById('info-page').style.display = "none";
+  document.getElementById('main-ui').style.display = "flex";
+  initEmulator();
+}
+
+/** * 4. EMULATOR CORE LOGIC */
+function initEmulator() {
+  const sidebar = document.getElementById('sidebar');
+  const gameDiv = document.getElementById('game');
+  const statusSpan = document.getElementById('status');
+  const progressSpan = document.getElementById('progress');
+
+  if (sidebar.querySelector('.load-btn')) {
+    refreshLibrary();
+    return;
+  }
+
+  const SYSTEMS = {
+    nds: "Nintendo DS", psp: "PlayStation Portable", gba: "Game Boy Advance",
+    gb: "Game Boy / Game Boy Color", nes: "NES", snes: "Super Nintendo", 
+    n64: "Nintendo 64", ps1: "PlayStation 1", gen: "Sega Genesis", 
+    sms: "Sega Master System", atari: "Atari 2600", citra: "Experimental: 3DS"
+  };
+
+  const EXTENSION_MAP = {
+    '.nds': { core: 'desmume', system: 'nds' },
+    '.iso': { core: 'ppsspp', system: 'psp' },
+    '.cso': { core: 'ppsspp', system: 'psp' },
+    '.gba': { core: 'gba', system: 'gba' },
+    '.gb':  { core: 'gb', system: 'gb' },
+    '.gbc': { core: 'gb', system: 'gb' },
+    '.nes': { core: 'nes', system: 'nes' },
+    '.smc': { core: 'snes', system: 'snes' },
+    '.sfc': { core: 'snes', system: 'snes' },
+    '.n64': { core: 'n64', system: 'n64' },
+    '.z64': { core: 'n64', system: 'n64' },
+    '.bin': { core: 'psx', system: 'ps1' },
+    '.cue': { core: 'psx', system: 'ps1' },
+    '.gen': { core: 'segaMD', system: 'gen' },
+    '.md':  { core: 'segaMD', system: 'gen' },
+    '.sms': { core: 'segaMS', system: 'sms' },
+    '.gg':  { core: 'segaMS', system: 'sms' },
+    '.a26': { core: 'atari2600', system: 'atari' },
+    '.3ds': { core: 'citra', system: 'citra' },
+    '.cci': { core: 'citra', system: 'citra' }
+  };
+
+  let currentURL = null;
+  const picker = document.createElement('input');
+  picker.type='file'; picker.multiple=true; picker.style.display='none';
+  document.body.appendChild(picker);
+
+  picker.onchange = () => {
+    for(const f of picker.files){
+      const reader = new FileReader();
+      reader.onload = () => {
+        const tx = db.transaction("roms", "readwrite");
+        tx.objectStore("roms").put({ name: f.name, data: reader.result });
+        tx.oncomplete = () => refreshLibrary();
+      };
+      reader.readAsArrayBuffer(f);
+    }
+  };
+
+  const loadBtn = document.createElement('button');
+  loadBtn.className = 'load-btn';
+  loadBtn.textContent = '📂 LOAD NEW ROMS';
+  loadBtn.onclick = () => picker.click();
+  sidebar.appendChild(loadBtn);
+
+  window.refreshLibrary = function() {
+    if(!db) return;
+    sidebar.querySelectorAll('.dynamic').forEach(e => e.remove());
+    const tx = db.transaction("roms", "readonly");
+    tx.objectStore("roms").getAll().onsuccess = e => {
+      const savedGames = e.target.result;
+      for(const key in SYSTEMS) {
+        const head = document.createElement('div');
+        head.className = 'section-title dynamic';
+        head.textContent = SYSTEMS[key];
+        sidebar.appendChild(head);
+
+        const systemGames = savedGames.filter(g => {
+          const ext = '.' + g.name.split('.').pop().toLowerCase();
+          return EXTENSION_MAP[ext] && EXTENSION_MAP[ext].system === key;
+        });
+
+        if(systemGames.length === 0) {
+          const p = document.createElement('div'); p.className='dynamic'; p.style.color='#333'; p.style.fontSize='11px'; p.style.marginBottom='10px'; p.textContent='No ROMs'; sidebar.appendChild(p);
+        } else {
+          systemGames.forEach(g => {
+            const row = document.createElement('div'); row.className = "game-row dynamic";
+            const b = document.createElement('button'); b.className = "game-btn"; b.textContent = g.name;
+            b.onclick = () => launchEJS(g);
+            const d = document.createElement('button'); d.className = "del-btn"; d.textContent = "×";
+            d.onclick = (e) => { e.stopPropagation(); deleteGame(g.name); };
+            row.appendChild(b); row.appendChild(d); sidebar.appendChild(row);
+          });
+        }
+      }
+    };
+  }
+
+  function deleteGame(name) {
+    if(confirm("Delete " + name + " from your local library?")) {
+      const tx = db.transaction("roms", "readwrite");
+      tx.objectStore("roms").delete(name);
+      tx.oncomplete = () => refreshLibrary();
+    }
+  }
+
+  function launchEJS(gameData) {
+    if(currentURL) URL.revokeObjectURL(currentURL);
+    const ext = '.' + gameData.name.split('.').pop().toLowerCase();
+    const sys = EXTENSION_MAP[ext];
+    statusSpan.textContent = "Booting " + gameData.name;
+    const blob = new Blob([gameData.data]);
+    currentURL = URL.createObjectURL(blob);
+    gameDiv.innerHTML = '<div id="emulator"></div>';
+
+    window.EJS_player = '#emulator';
+    window.EJS_core = sys.core;
+    window.EJS_gameUrl = currentURL;
+    window.EJS_startOnLoaded = true;
+    window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+
+    if(sys.core === 'desmume') {
+      window.EJS_settings = { "desmume_high_res_3d": "true", "desmume_internal_resolution": "1024x768" };
+    }
+
+    window.EJS_onProgress = (percent) => {
+      progressSpan.textContent = "Loading Core: " + percent + "%";
+    };
+
+    const s = document.createElement('script');
+    s.src = window.EJS_pathtodata + 'loader.js';
+    document.body.appendChild(s);
+  }
+  refreshLibrary();
+}
+
+function factoryReset() { if(confirm("This will WIPE all saved ROMs and settings. Continue?")) { indexedDB.deleteDatabase("SystemLibraryDB"); location.reload(); } }
+</script>
+</body>
+</html>
